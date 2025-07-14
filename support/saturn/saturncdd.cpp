@@ -495,10 +495,23 @@ void satcdd_t::Reset() {
 
 int satcdd_t::CalcSeekDelay(int lba_old, int lba_new)
 {
-	int diff = lba_new - lba_old;
-	int n = abs(diff) / 2000;
-	if (diff < 0) n += 2;
-	return n;
+    int diff = lba_new - lba_old;
+    int distance = abs(diff);
+    
+    int delay_ms;
+    if (distance < 5000) {
+        delay_ms = 90;
+    } else if (distance < 20000) {
+        delay_ms = 110;
+    } else {
+        delay_ms = 135;
+    }
+     if (diff < 0) {
+        delay_ms += 25;
+    }
+    
+    int frames = (delay_ms + 16) / 17;
+    return (frames < 1) ? 1 : frames;
 }
 
 int satcdd_t::GetSectorOffsetByIndex(int tno, int idx) {
